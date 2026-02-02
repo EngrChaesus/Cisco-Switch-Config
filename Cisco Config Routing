@@ -1,0 +1,72 @@
+For example, VLAN 10 ip address 10.10.10.1/24 port 1. vlan 100 ip address 10.100.100.100/24 port 24
+for dhcp pool "NAME"
+
+#Create VLAN for end user. 
+vlan 10
+name LAN
+
+#config vlan interface
+interface vlan 10
+ip address 10.10.10.1 255.255.255.0
+description LAN10
+
+#create dhcp pool
+ip dhcp pool "LAN"
+network 10.10.10.0 255.255.255.0
+default-router 10.10.10.1
+dns-server 8.8.8.8
+
+#create ip exclude
+ip dhcp excluded-address 10.10.10.1
+
+#select port for the vlan
+int gig 1/0/1
+switchport mode access
+switchport access vlan 10
+spanning-tree portfast
+
+#test if getting an ip address
+
+
+#select port for management port 24
+#create vlan
+vlan 100
+name MANAGEMENT
+
+#input ip address to vlan
+int vlan 100
+ip address 10.100.100.100 255.255.255.0 
+description SW_MANAGEMENT
+
+#input vlan in the port 24
+int gig 1/0/24
+switchport mode access
+switch access vlan 100
+spanning-tree portfast
+
+#configure static routing
+ip routing
+#ip route 0.0.0.0 0.0.0.0 (gateway/management ip of firewall/downlink to switch)
+
+#configure firewall
+#network > interface
+#edit any port ip address must not conflict to any ip address or vlan
+
+#network > static routes
+#destination: vlan network address/subnet mask
+#gateway: management ip of switch
+#interface: port going to switch
+destination: 10.10.10.0/24
+gateway: 10.100.100.100
+port: downlink interface
+
+
+
+
+
+
+
+
+
+
+
