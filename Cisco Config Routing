@@ -15,7 +15,9 @@ ip dhcp pool "LAN"
 network 10.10.10.0 255.255.255.0
 default-router 10.10.10.1
 dns-server 8.8.8.8
+#lease (day hour minute)
 lease 0 12 0
+
 
 #create ip exclude
 ip dhcp excluded-address 10.10.10.1
