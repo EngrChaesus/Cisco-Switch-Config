@@ -49,7 +49,7 @@ spanning-tree portfast
 
 #configure static routing
 ip routing
-#ip route 0.0.0.0 0.0.0.0 (gateway/management ip of firewall/downlink to switch)
+#ip route 0.0.0.0 0.0.0.0(gateway/management ip of firewall/downlink to switch)
 
 #configure firewall
 #network > interface
