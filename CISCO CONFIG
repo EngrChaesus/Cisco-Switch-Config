@@ -1,0 +1,127 @@
+#ANALOG PHONE
+
+configure terminal
+ dial-peer voice 1 pots
+  destination-pattern 8100
+  !--Voice ports on this sim do not exist and does not work. Added an exclamation mark to set it as a comment
+  !port 0/0/0
+ dial-peer voice 2 pots
+  destination-pattern 8101
+  !port 0/0/1
+ dial-peer voice 3 pots
+  destination-pattern 8102
+  !port 0/0/2
+ dial-peer voice 4 pots
+  destination-pattern 8103
+  !port 0/0/3
+  end
+
+#TELEPHONE SERVICES
+conf t
+ no telephony-service
+ telephony-service
+  no auto assign
+  no auto-reg-ephone
+  max-ephones 5
+  max-dn 20
+  ip source-address 10.81.100.8 port 2000
+  create cnf-files
+ ephone-dn 1
+  number 8111
+ ephone-dn 2
+  number 8122
+ ephone-dn 3
+  number 8133
+ ephone-dn 4
+  number 8144
+ ephone-dn 5
+  number 8155
+ ephone-dn 6
+  number 8166
+ ephone-dn 7
+  number 8177
+ ephone-dn 8
+  number 8188
+ ephone 1
+  mac-address 00a2.cd43.b1c7
+  type 8945
+  button 1:1 2:2 3:3 4:4
+  restart
+ ephone 2
+  mac-address 00e3.11ff.21cd
+  type 8945
+  button 1:5 2:6 3:7 4:8
+  restart
+ end
+
+
+!@video call
+conf t
+ ephone 1
+  video
+ voice service voip
+ h323
+ call start slow
+ ephone 2
+  video
+ voice service voip
+ h323
+ call start slow
+end
+
+#INCOMING CALLS
+@CUCM
+configure terminal
+ voice service voip
+ ip address trusted list
+ ipv4 0.0.0.0 0.0.0.0
+ end
+
+#OUTGOING CALLS
+@CUCM
+configure terminal
+ dial-peer voice 92 Voip
+ destination-pattern 92..
+ session target ipv4:10.92.100.8
+ codec g711ULAW
+
+
+#IVRS
+config t
+ dial-peer voice 69 voip
+  service rivanaa out-bound
+  destination-pattern 8169
+  session target ipv4:10.81.100.8
+  incoming called-number 8169
+  dtmf-relay h245-alphanumeric
+  codec g711ulaw
+  no vad
+ !
+ telephony-service
+  moh "flash:/en_bacd_music_on_hold.au"
+ !
+ application
+  service rivanaa flash:app-b-acd-aa-3.0.0.2.tcl
+   paramspace english index 1        
+   param number-of-hunt-grps 2
+   param dial-by-extension-option 8
+   param handoff-string rivanaa
+   param welcome-prompt flash:en_bacd_welcome.au
+   paramspace english language en
+   param call-retry-timer 15
+   param service-name rivanqueue
+   paramspace english location flash:
+   param second-greeting-time 60
+   param max-time-vm-retry 2
+   param voice-mail 1234
+   param max-time-call-retry 700
+   param aa-pilot _69
+  service rivanqueue flash:app-b-acd-3.0.0.2.tcl
+   param queue-len 15
+   param aa-hunt1 8100
+   param aa-hunt2 8101
+   param aa-hunt3 8177
+   param aa-hunt4 8133
+   param queue-manager-debugs 1
+   param number-of-hunt-grps 4
+   end
